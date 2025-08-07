@@ -3,12 +3,11 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Header from './components/Header';
 import Home from './screens/Home';
-import Toolbar from './components/ui/Toolbar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -25,41 +24,34 @@ export default function App() {
     'SpButchLiteLight': require('./assets/fonts/SpButchLiteLight.otf'),
   });
 
-  const [showToolbar, setShowToolbar] = useState(false);
-
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
 
-  const handleMenuPress = () => {
-    setShowToolbar(!showToolbar);
-  };
-
   if (!fontsLoaded) {
     return null;
   }
 
   return (
-    <SafeAreaProvider>
-      <View style={styles.container} onLayout={onLayoutRootView}>
-        {/* Use native StatusBar for proper Android support */}
-        <StatusBar
-          backgroundColor="#1a1a1a"
-          barStyle="light-content"
-        />
-        <Header onMenuPress={handleMenuPress} />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <View style={styles.container} onLayout={onLayoutRootView}>
+          {/* Use native StatusBar for proper Android support */}
+          <StatusBar
+            backgroundColor="#1a1a1a"
+            barStyle="light-content"
+          />
+          <Header />
 
-
-
-
-        {/* <Header rightComponent={<History />}/> */}
-        <SafeAreaView style={styles.content}>
-          {showToolbar ? <Toolbar /> : <Home />}
-        </SafeAreaView>
-      </View>
-    </SafeAreaProvider>
+          {/* <Header rightComponent={<History />}/> */}
+          <SafeAreaView style={styles.content}>
+            <Home />
+          </SafeAreaView>
+        </View>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 

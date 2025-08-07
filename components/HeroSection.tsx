@@ -56,7 +56,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onGenderChange }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: -60,
+    marginTop: -30,
     alignItems: 'center',
     width: '100%',
   },

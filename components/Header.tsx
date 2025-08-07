@@ -1,7 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MenuBurger from './ui/MenuBurger';
+import { BUTTONS_LIST } from '../utils/buttons';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { SFSymbol } from 'react-native-sfsymbols';
+import Config from '../config/Config';
 
 interface HeaderProps {
   title?: string;
@@ -19,6 +23,68 @@ const Header: React.FC<HeaderProps> = ({
   onMenuPress
 }) => {
   const insets = useSafeAreaInsets();
+  const [showTooltip, setShowTooltip] = useState(false);
+  const fadeAnim = new Animated.Value(0);
+  const scaleAnim = new Animated.Value(0.8);
+
+  useEffect(() => {
+    if (showTooltip) {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 0.8,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [showTooltip]);
+
+  const handleMenuPress = () => {
+    setShowTooltip(!showTooltip);
+    if (onMenuPress) {
+      onMenuPress();
+    }
+  };
+
+  const renderButton = (item: any, index: number) => (
+    <TouchableOpacity
+      key={index}
+      style={[styles.button, { backgroundColor: item.color }]}
+      activeOpacity={0.7}
+    >
+      {Config.isIos ? (
+        <SFSymbol
+          name={item.icon}
+          weight="semibold"
+          scale="large"
+          color="white"
+          size={16}
+          resizeMode="center"
+          multicolor={false}
+        />
+      ) : (
+        <Icon name={item.icon} color="white" size={16} />
+      )}
+    </TouchableOpacity>
+  );
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -50,7 +116,7 @@ const Header: React.FC<HeaderProps> = ({
         <View style={styles.rightSection}>
           {rightComponent || (
             <MenuBurger 
-              onPress={onMenuPress}
+              onPress={handleMenuPress}
               size={24}
               color="#ffffff"
               style={styles.menuButton}
@@ -58,6 +124,31 @@ const Header: React.FC<HeaderProps> = ({
           )}
         </View>
       </View>
+
+      {/* Tooltip */}
+      {showTooltip && (
+        <Animated.View 
+          style={[
+            styles.tooltipContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ scale: scaleAnim }],
+            }
+          ]}
+        >
+          <View style={styles.tooltip}>
+            <ScrollView 
+              style={styles.scrollView}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContent}
+            >
+              <View style={styles.buttonsGrid}>
+                {BUTTONS_LIST.map((item, index) => renderButton(item, index))}
+              </View>
+            </ScrollView>
+          </View>
+        </Animated.View>
+      )}
     </View>
   );
 };
@@ -115,6 +206,54 @@ const styles = StyleSheet.create({
   },
   menuButton: {
     padding: 4,
+  },
+  tooltipContainer: {
+    position: 'absolute',
+    top: 70,
+    right: 16,
+    zIndex: 1000,
+  },
+  tooltip: {
+    backgroundColor: '#333333',
+    paddingHorizontal: 4,
+    // paddingVertical: 4,
+    borderRadius: 8,
+    height: 105,
+    width: 100,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingVertical: 8,
+  },
+  buttonsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
+    width: '100%',
+  },
+  button: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 2,
+  },
+  tooltipText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 
