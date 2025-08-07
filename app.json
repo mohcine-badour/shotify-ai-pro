@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.shotify.ai"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -30,6 +31,11 @@
         "asset": "./assets/fonts/Fear-robot-regular.ttf",
         "family": "Fear-robot-regular"
       }
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d65f84ba-12ff-477f-8e6c-49b9c9dc7ed2"
+      }
+    }
   }
 }
