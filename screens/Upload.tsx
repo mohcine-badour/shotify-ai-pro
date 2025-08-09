@@ -2,11 +2,27 @@ import React from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Modal, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as ImagePicker from 'expo-image-picker';
 
 const Upload: React.FC = () => {
-  const handleUploadPress = () => {
-    // Placeholder: open file picker integration can be added later
-    console.log('Tap to upload photo');
+  const handleUploadPress = async () => {
+    if (photos.length >= MAX_PHOTOS) return;
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') return;
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      selectionLimit: MAX_PHOTOS - photos.length,
+      quality: 1,
+    });
+    if (result.canceled) return;
+    const uris = result.assets?.map(a => a.uri).filter(Boolean) as string[];
+    if (uris?.length) {
+      setPhotos(prev => {
+        const remaining = MAX_PHOTOS - prev.length;
+        return [...prev, ...uris.slice(0, remaining)];
+      });
+    }
   };
 
   const [permission, requestPermission] = useCameraPermissions();
@@ -105,6 +121,11 @@ const Upload: React.FC = () => {
                    })}
                  </View>
                  <Text style={styles.hint}>{photos.length}/{MAX_PHOTOS} selected</Text>
+                 {photos.length < MAX_PHOTOS && (
+                   <TouchableOpacity onPress={handleUploadPress} activeOpacity={0.7}>
+                     <Text style={[styles.actionLink, { marginTop: 8 }]}>Tap to upload photo</Text>
+                   </TouchableOpacity>
+                 )}
                </>
              )}
            </View>
@@ -117,7 +138,7 @@ const Upload: React.FC = () => {
             <View style={styles.line} />
           </View>
 
-          {photos.length >= 2 ? (
+          {photos.length >= 3 ? (
             <TouchableOpacity style={styles.primaryButton} onPress={handleStartGeneration} activeOpacity={0.8}>
               <Text style={styles.primaryButtonText}>Start generation</Text>
             </TouchableOpacity>
