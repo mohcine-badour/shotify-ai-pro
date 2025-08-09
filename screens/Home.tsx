@@ -39,17 +39,17 @@ const Home: React.FC = () => {
     },
     {
       id: 'm2', 
-      source: require('../assets/images/man-business.jpg'),
+      source: require('../assets/images/man-casual.jpg'),
       title: 'Casual'
     },
     {
       id: 'm3',
-      source: require('../assets/images/man-business.jpg'),
+      source: require('../assets/images/man-formal.jpg'),
       title: 'Formal'
     },
     {
       id: 'm4',
-      source: require('../assets/images/man-business.jpg'),
+      source: require('../assets/images/man-sport.jpg'),
       title: 'Sport'
     }
   ];
@@ -59,7 +59,13 @@ const Home: React.FC = () => {
   };
 
   const handleCardPress = (imageId: string) => {
+    // Use a custom event to signal navigation to Upload without introducing a full router
+    // App.tsx listens via a simple global callback on the App object if needed
+    // For this simple setup, we dispatch a custom event the App can subscribe to if required
+    // But since we directly switch in App, we'll just emit a global event on window if available
+    // and also log for debugging
     console.log('Card pressed:', imageId);
+    (globalThis as any).__NAVIGATE_TO_UPLOAD__?.();
   };
 
   const currentImagesData = selectedGender === 'female' ? femaleImagesData : maleImagesData;

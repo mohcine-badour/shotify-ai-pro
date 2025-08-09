@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, Image, StyleSheet, Dimensions, FlatList } from 'react-native'
+import { Text, View, Image, StyleSheet, Dimensions, FlatList, TouchableOpacity } from 'react-native'
 
 interface ImageData {
   id: string
@@ -18,7 +18,11 @@ export default class ChooseStyle extends Component<CardProps> {
     
     return (
       <View style={styles.cardContainer}>
-        <View style={styles.card}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => onPress && onPress(item.id)}
+          style={styles.card}
+        >
           <Image 
             source={item.source}
             style={styles.fullScaleImage}
@@ -32,7 +36,7 @@ export default class ChooseStyle extends Component<CardProps> {
             <View style={styles.gradientLayer3} />
             <Text style={styles.titleText}>{item.title}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
     )
   }

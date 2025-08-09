@@ -7,6 +7,7 @@ import React, { useCallback } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Header from './components/Header';
 import Home from './screens/Home';
+import Upload from './screens/Upload';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Keep the splash screen visible while we fetch resources
@@ -34,6 +35,20 @@ export default function App() {
     return null;
   }
 
+  const [currentScreen, setCurrentScreen] = React.useState<'home' | 'upload'>('home');
+
+  const navigateToUpload = () => setCurrentScreen('upload');
+  const navigateBackHome = () => setCurrentScreen('home');
+
+  React.useEffect(() => {
+    (globalThis as any).__NAVIGATE_TO_UPLOAD__ = navigateToUpload;
+    return () => {
+      if ((globalThis as any).__NAVIGATE_TO_UPLOAD__) {
+        delete (globalThis as any).__NAVIGATE_TO_UPLOAD__;
+      }
+    };
+  }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
@@ -43,11 +58,19 @@ export default function App() {
             backgroundColor="#1a1a1a"
             barStyle="light-content"
           />
-          <Header />
+          <Header
+            title={currentScreen === 'home' ? 'Shotify AI' : 'Shotify Upload'}
+            showBackButton={currentScreen !== 'home'}
+            onBackPress={navigateBackHome}
+          />
 
           {/* <Header rightComponent={<History />}/> */}
           <SafeAreaView style={styles.content}>
-            <Home />
+            {currentScreen === 'home' ? (
+              <Home />
+            ) : (
+              <Upload />
+            )}
           </SafeAreaView>
         </View>
       </SafeAreaProvider>

@@ -6,6 +6,7 @@ import { BUTTONS_LIST } from '../utils/buttons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { SFSymbol } from 'react-native-sfsymbols';
 import Config from '../config/Config';
+import BackIcon from './ui/BackIcon';
 
 interface HeaderProps {
   title?: string;
@@ -97,7 +98,7 @@ const Header: React.FC<HeaderProps> = ({
               onPress={onBackPress}
               activeOpacity={0.7}
             >
-              <Text style={styles.backButtonText}>←</Text>
+              <BackIcon size={24} color="#ffffff" />
             </TouchableOpacity>
           )}
           {!showBackButton && (
@@ -209,14 +210,13 @@ const styles = StyleSheet.create({
   },
   tooltipContainer: {
     position: 'absolute',
-    top: 70,
+    top: 100,
     right: 16,
     zIndex: 1000,
   },
   tooltip: {
     backgroundColor: '#333333',
     paddingHorizontal: 4,
-    // paddingVertical: 4,
     borderRadius: 8,
     height: 105,
     width: 100,
