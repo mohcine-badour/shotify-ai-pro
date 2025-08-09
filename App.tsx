@@ -25,16 +25,7 @@ export default function App() {
     'SpButchLiteLight': require('./assets/fonts/SpButchLiteLight.otf'),
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
-
+  // Screen state should be created before any conditional returns to keep Hooks order stable
   const [currentScreen, setCurrentScreen] = React.useState<'home' | 'upload'>('home');
 
   const navigateToUpload = () => setCurrentScreen('upload');
@@ -48,6 +39,16 @@ export default function App() {
       }
     };
   }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

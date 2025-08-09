@@ -13,7 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs camera access to take your selfie for verification.",
+        "NSMicrophoneUsageDescription": "Microphone access is required if you record videos."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +25,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.shotify.ai"
+      "package": "com.shotify.ai",
+      "permissions": ["android.permission.CAMERA"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,6 +41,15 @@
       "eas": {
         "projectId": "d65f84ba-12ff-477f-8e6c-49b9c9dc7ed2"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
+        }
+      ]
+    ]
   }
 }
