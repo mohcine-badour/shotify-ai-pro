@@ -1,9 +1,9 @@
 import React from 'react';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Modal, Dimensions } from 'react-native';
 import DownloadIcon from '../components/ui/DownloadIcon';
 import ShareIcon from '../components/ui/ShareIcon';
 import ViewIcon from '../components/ui/ViewIcon';
+import CloseIcon from '../components/ui/CloseIcon';
 
 interface ResultatProps {
   onBackToHome?: () => void;
@@ -11,6 +11,8 @@ interface ResultatProps {
 }
 
 const Resultat: React.FC<ResultatProps> = ({ onBackToHome, selectedStyle = 'Business' }) => {
+  const [showViewModal, setShowViewModal] = React.useState(false);
+  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
   // Mock generated headshot based on selected style
   const getHeadshotUri = (style: string) => {
     const styleColors = {
@@ -39,6 +41,7 @@ const Resultat: React.FC<ResultatProps> = ({ onBackToHome, selectedStyle = 'Busi
 
   const handleView = (headshotId: string) => {
     console.log('Viewing headshot:', headshotId);
+    setShowViewModal(true);
   };
 
   return (
@@ -85,10 +88,35 @@ const Resultat: React.FC<ResultatProps> = ({ onBackToHome, selectedStyle = 'Busi
           <TouchableOpacity style={styles.primaryButton} onPress={onBackToHome} activeOpacity={0.8}>
             <Text style={styles.primaryButtonText}>Generate More</Text>
           </TouchableOpacity>
-        </View>
-      </View>
-    </SafeAreaView>
-  );
+                 </View>
+       </View>
+
+       {/* Full-screen View Modal */}
+       <Modal visible={showViewModal} animationType="fade" transparent>
+         <View style={styles.viewModalOverlay}>
+           <View style={styles.viewModalContainer}>
+             <View style={styles.viewModalHeader}>
+               <Text style={styles.viewModalTitle}>{generatedHeadshot.style}</Text>
+                               <TouchableOpacity
+                  onPress={() => setShowViewModal(false)}
+                  style={styles.closeViewButton}
+                  activeOpacity={0.8}
+                >
+                  <CloseIcon width={24} height={24} color="#ffffff" />
+                </TouchableOpacity>
+             </View>
+             <View style={styles.viewModalImageContainer}>
+               <Image 
+                 source={{ uri: generatedHeadshot.uri }} 
+                 style={[styles.viewModalImage, { width: screenWidth - 40, height: screenHeight * 0.7 }]} 
+                 resizeMode="contain" 
+               />
+             </View>
+           </View>
+         </View>
+       </Modal>
+     </SafeAreaView>
+   );
 };
 
 const styles = StyleSheet.create({
@@ -112,7 +140,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     color: '#bfbfbf',
-    fontSize: 16,
+    fontSize: 14,
     lineHeight: 22,
   },
   headshotContainer: {
@@ -176,6 +204,46 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'SpButchLiteLight',
     fontWeight: '600',
+  },
+  viewModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  viewModalContainer: {
+    flex: 1,
+    width: '100%',
+    padding: 20,
+  },
+  viewModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 10,
+  },
+  viewModalTitle: {
+    color: '#ffffff',
+    fontSize: 24,
+    fontFamily: 'SpButchLiteLight',
+  },
+  closeViewButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  viewModalImageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  viewModalImage: {
+    borderRadius: 12,
   },
 });
 
