@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Header from './components/Header';
 import Home from './screens/Home';
 import Upload from './screens/Upload';
+import Resultat from './screens/Resultat';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Keep the splash screen visible while we fetch resources
@@ -26,16 +27,21 @@ export default function App() {
   });
 
   // Screen state should be created before any conditional returns to keep Hooks order stable
-  const [currentScreen, setCurrentScreen] = React.useState<'home' | 'upload'>('home');
+  const [currentScreen, setCurrentScreen] = React.useState<'home' | 'upload' | 'resultat'>('home');
 
   const navigateToUpload = () => setCurrentScreen('upload');
+  const navigateToResultat = () => setCurrentScreen('resultat');
   const navigateBackHome = () => setCurrentScreen('home');
 
   React.useEffect(() => {
     (globalThis as any).__NAVIGATE_TO_UPLOAD__ = navigateToUpload;
+    (globalThis as any).__NAVIGATE_TO_RESULTAT__ = navigateToResultat;
     return () => {
       if ((globalThis as any).__NAVIGATE_TO_UPLOAD__) {
         delete (globalThis as any).__NAVIGATE_TO_UPLOAD__;
+      }
+      if ((globalThis as any).__NAVIGATE_TO_RESULTAT__) {
+        delete (globalThis as any).__NAVIGATE_TO_RESULTAT__;
       }
     };
   }, []);
@@ -60,7 +66,7 @@ export default function App() {
             barStyle="light-content"
           />
           <Header
-            title={currentScreen === 'home' ? 'Shotify AI' : 'Shotify Upload'}
+            title={currentScreen === 'home' ? 'Shotify AI' : currentScreen === 'upload' ? 'Upload' : 'Results'}
             showBackButton={currentScreen !== 'home'}
             onBackPress={navigateBackHome}
           />
@@ -69,8 +75,13 @@ export default function App() {
           <SafeAreaView style={styles.content}>
             {currentScreen === 'home' ? (
               <Home />
-            ) : (
+            ) : currentScreen === 'upload' ? (
               <Upload />
+            ) : (
+              <Resultat 
+                onBackToHome={navigateBackHome} 
+                selectedStyle={(globalThis as any).__SELECTED_STYLE__ || 'Business'}
+              />
             )}
           </SafeAreaView>
         </View>

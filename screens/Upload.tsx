@@ -83,6 +83,8 @@ const Upload: React.FC = () => {
         if (prev >= 100) {
           clearInterval(interval);
           setShowLoading(false);
+          // Navigate to results after loading completes
+          (globalThis as any).__NAVIGATE_TO_RESULTAT__?.();
           return 100;
         }
         return prev + 10;

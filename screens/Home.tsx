@@ -59,12 +59,14 @@ const Home: React.FC = () => {
   };
 
   const handleCardPress = (imageId: string) => {
-    // Use a custom event to signal navigation to Upload without introducing a full router
-    // App.tsx listens via a simple global callback on the App object if needed
-    // For this simple setup, we dispatch a custom event the App can subscribe to if required
-    // But since we directly switch in App, we'll just emit a global event on window if available
-    // and also log for debugging
-    console.log('Card pressed:', imageId);
+    // Find the selected style based on imageId
+    const selectedImage = currentImagesData.find(img => img.id === imageId);
+    const selectedStyle = selectedImage?.title || 'Business';
+    
+    console.log('Card pressed:', imageId, 'Style:', selectedStyle);
+    
+    // Store the selected style globally for the Resultat component
+    (globalThis as any).__SELECTED_STYLE__ = selectedStyle;
     (globalThis as any).__NAVIGATE_TO_UPLOAD__?.();
   };
 

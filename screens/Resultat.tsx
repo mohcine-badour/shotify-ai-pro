@@ -1,0 +1,182 @@
+import React from 'react';
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import DownloadIcon from '../components/ui/DownloadIcon';
+import ShareIcon from '../components/ui/ShareIcon';
+import ViewIcon from '../components/ui/ViewIcon';
+
+interface ResultatProps {
+  onBackToHome?: () => void;
+  selectedStyle?: string;
+}
+
+const Resultat: React.FC<ResultatProps> = ({ onBackToHome, selectedStyle = 'Business' }) => {
+  // Mock generated headshot based on selected style
+  const getHeadshotUri = (style: string) => {
+    const styleColors = {
+      'Business': '0099FF',
+      'Casual': 'FF6B6B', 
+      'Formal': '4ECDC4',
+      'Sport': '45B7D1'
+    };
+    const color = styleColors[style as keyof typeof styleColors] || '0099FF';
+    return `https://via.placeholder.com/400x500/${color}/FFFFFF?text=${style}`;
+  };
+
+  const generatedHeadshot = {
+    id: '1',
+    uri: getHeadshotUri(selectedStyle),
+    style: selectedStyle
+  };
+
+  const handleDownload = (headshotId: string) => {
+    console.log('Downloading headshot:', headshotId);
+  };
+
+  const handleShare = (headshotId: string) => {
+    console.log('Sharing headshot:', headshotId);
+  };
+
+  const handleView = (headshotId: string) => {
+    console.log('Viewing headshot:', headshotId);
+  };
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Your Headshots</Text>
+          <Text style={styles.subtitle}>Generated successfully! Here are your professional headshots.</Text>
+        </View>
+
+        <View style={styles.headshotContainer}>
+          <View style={styles.headshotCard}>
+            <Image source={{ uri: generatedHeadshot.uri }} style={styles.headshotImage} resizeMode="cover" />
+            <View style={styles.headshotOverlay}>
+              <Text style={styles.headshotStyle}>{generatedHeadshot.style}</Text>
+                             <View style={styles.actionButtons}>
+                 <TouchableOpacity
+                   onPress={() => handleView(generatedHeadshot.id)}
+                   style={styles.actionButton}
+                   activeOpacity={0.8}
+                 >
+                   <ViewIcon width={20} height={20} color="#ffffff" strokeWidth={1.5} />
+                 </TouchableOpacity>
+                 <TouchableOpacity
+                   onPress={() => handleDownload(generatedHeadshot.id)}
+                   style={styles.actionButton}
+                   activeOpacity={0.8}
+                 >
+                   <DownloadIcon width={20} height={20} color="#ffffff" />
+                 </TouchableOpacity>
+                 <TouchableOpacity
+                   onPress={() => handleShare(generatedHeadshot.id)}
+                   style={styles.actionButton}
+                   activeOpacity={0.8}
+                 >
+                   <ShareIcon width={20} height={20} color="#ffffff" strokeWidth={1.5} />
+                 </TouchableOpacity>
+               </View>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.bottomActions}>
+          <TouchableOpacity style={styles.primaryButton} onPress={onBackToHome} activeOpacity={0.8}>
+            <Text style={styles.primaryButtonText}>Generate More</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#1a1a1a',
+  },
+  container: {
+    flex: 1,
+    padding: 18,
+    marginTop: -50,
+  },
+  header: {
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 28,
+    color: '#ffffff',
+    fontFamily: 'SpButchLiteLight',
+    marginBottom: 8,
+  },
+  subtitle: {
+    color: '#bfbfbf',
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  headshotContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  headshotCard: {
+    width: '100%',
+    maxHeight: "100%",
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#141414',
+    borderWidth: 1,
+    borderColor: '#262626',
+  },
+  headshotImage: {
+    width: '100%',
+    height: 450,
+  },
+  headshotOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 12,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+  },
+  headshotStyle: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontFamily: 'SpButchLiteLight',
+    marginBottom: 8,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  actionButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomActions: {
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#262626',
+  },
+  primaryButton: {
+    backgroundColor: '#0099FF',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  primaryButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontFamily: 'SpButchLiteLight',
+    fontWeight: '600',
+  },
+});
+
+export default Resultat;
