@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Modal, Dimensions } from 'react-native';
+import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image, Modal, Dimensions, Share, Alert } from 'react-native';
 import DownloadIcon from '../components/ui/DownloadIcon';
 import ShareIcon from '../components/ui/ShareIcon';
 import ViewIcon from '../components/ui/ViewIcon';
@@ -35,8 +35,32 @@ const Resultat: React.FC<ResultatProps> = ({ onBackToHome, selectedStyle = 'Busi
     console.log('Downloading headshot:', headshotId);
   };
 
-  const handleShare = (headshotId: string) => {
-    console.log('Sharing headshot:', headshotId);
+  const handleShare = async (headshotId: string) => {
+    try {
+      const shareOptions = {
+        title: 'Check out my AI-generated headshot!',
+        message: `I just created a professional ${selectedStyle} headshot using Shotify AI. Take a look!`,
+        url: generatedHeadshot.uri, // This will work for local images too
+      };
+
+      const result = await Share.share(shareOptions);
+      
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+          console.log('Shared with activity type:', result.activityType);
+        } else {
+          // shared
+          console.log('Shared successfully');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+        console.log('Share dismissed');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      Alert.alert('Error', 'Failed to share the image. Please try again.');
+    }
   };
 
   const handleView = (headshotId: string) => {
