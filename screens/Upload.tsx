@@ -5,6 +5,15 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 
 const Upload: React.FC = () => {
+  const [permission, requestPermission] = useCameraPermissions();
+  const [showCamera, setShowCamera] = React.useState(false);
+  const cameraRef = React.useRef<any>(null);
+  const [capturedUri, setCapturedUri] = React.useState<string | null>(null);
+  const [photos, setPhotos] = React.useState<string[]>([]);
+  const MAX_PHOTOS = 3;
+  const [showLoading, setShowLoading] = React.useState(false);
+  const [progress, setProgress] = React.useState(0);
+
   const handleUploadPress = async () => {
     if (photos.length >= MAX_PHOTOS) return;
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -24,13 +33,6 @@ const Upload: React.FC = () => {
       });
     }
   };
-
-  const [permission, requestPermission] = useCameraPermissions();
-  const [showCamera, setShowCamera] = React.useState(false);
-  const cameraRef = React.useRef<any>(null);
-  const [capturedUri, setCapturedUri] = React.useState<string | null>(null);
-  const [photos, setPhotos] = React.useState<string[]>([]);
-  const MAX_PHOTOS = 3;
 
   const handleOpenCamera = async () => {
     if (photos.length >= MAX_PHOTOS) {
@@ -68,13 +70,24 @@ const Upload: React.FC = () => {
     setCapturedUri(null);
   };
 
-  const handleStartGeneration = () => {
-    // Placeholder for generation action
-    console.log('Start generation with photos:', photos);
-  };
-
   const handleDeletePhoto = (index: number) => {
     setPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleStartGeneration = () => {
+    setShowLoading(true);
+    setProgress(0);
+    // Simulate progress updates
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setShowLoading(false);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 500);
   };
 
   return (
@@ -85,50 +98,50 @@ const Upload: React.FC = () => {
           Upload 3 photos of yourself to get started.
         </Text>
 
-          <View style={styles.card}>
-           <View style={styles.dropZone}>
-             {photos.length === 0 ? (
-               <>
-                 <View style={styles.cloudCircle}>
-                   <Icon name="cloud-upload" size={26} color="#8aa4ff" />
-                 </View>
-                 <TouchableOpacity onPress={handleUploadPress} activeOpacity={0.7}>
-                   <Text style={styles.actionLink}>Tap to upload photo</Text>
-                 </TouchableOpacity>
-                 <Text style={styles.hint}>PNG, JPG or PDF (max. 800x400px)</Text>
-               </>
-             ) : (
-               <>
-                 <View style={styles.photoGrid}>
-                   {Array.from({ length: MAX_PHOTOS }).map((_, idx) => {
-                     const uri = photos[idx];
-                     return (
-                       <View key={idx} style={[styles.photoItem, !uri && styles.photoEmpty]}> 
-                         {uri && (
-                           <>
-                             <Image source={{ uri }} style={styles.photoImage} resizeMode="cover" />
-                             <TouchableOpacity
-                               onPress={() => handleDeletePhoto(idx)}
-                               style={styles.deleteBadge}
-                               activeOpacity={0.8}
-                             >
-                               <Icon name="close" size={14} color="#fff" />
-                             </TouchableOpacity>
-                           </>
-                         )}
-                       </View>
-                     );
-                   })}
-                 </View>
-                 <Text style={styles.hint}>{photos.length}/{MAX_PHOTOS} selected</Text>
-                 {photos.length < MAX_PHOTOS && (
-                   <TouchableOpacity onPress={handleUploadPress} activeOpacity={0.7}>
-                     <Text style={[styles.actionLink, { marginTop: 8 }]}>Tap to upload photo</Text>
-                   </TouchableOpacity>
-                 )}
-               </>
-             )}
-           </View>
+        <View style={styles.card}>
+          <View style={styles.dropZone}>
+            {photos.length === 0 ? (
+              <>
+                <View style={styles.cloudCircle}>
+                  <Icon name="cloud-upload" size={26} color="#8aa4ff" />
+                </View>
+                <TouchableOpacity onPress={handleUploadPress} activeOpacity={0.7}>
+                  <Text style={styles.actionLink}>Tap to upload photo</Text>
+                </TouchableOpacity>
+                <Text style={styles.hint}>PNG, JPG or PDF (max. 800x400px)</Text>
+              </>
+            ) : (
+              <>
+                <View style={styles.photoGrid}>
+                  {Array.from({ length: MAX_PHOTOS }).map((_, idx) => {
+                    const uri = photos[idx];
+                    return (
+                      <View key={idx} style={[styles.photoItem, !uri && styles.photoEmpty]}> 
+                        {uri && (
+                          <>
+                            <Image source={{ uri }} style={styles.photoImage} resizeMode="cover" />
+                            <TouchableOpacity
+                              onPress={() => handleDeletePhoto(idx)}
+                              style={styles.deleteBadge}
+                              activeOpacity={0.8}
+                            >
+                              <Icon name="close" size={14} color="#fff" />
+                            </TouchableOpacity>
+                          </>
+                        )}
+                      </View>
+                    );
+                  })}
+                </View>
+                <Text style={styles.hint}>{photos.length}/{MAX_PHOTOS} selected</Text>
+                {photos.length < MAX_PHOTOS && (
+                  <TouchableOpacity onPress={handleUploadPress} activeOpacity={0.7}>
+                    <Text style={[styles.actionLink, { marginTop: 8 }]}>Tap to upload photo</Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            )}
+          </View>
 
           <View style={styles.orRow}>
             <View style={styles.line} />
@@ -177,6 +190,20 @@ const Upload: React.FC = () => {
               )}
             </View>
           </SafeAreaView>
+        </Modal>
+
+        <Modal visible={showLoading} animationType="fade" transparent>
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingCard}>
+              <Text style={styles.loadingTitle}>Generating your headshots...</Text>
+              <View style={styles.progressContainer}>
+                <View style={styles.progressBar}>
+                  <View style={[styles.progressFill, { width: `${progress}%` }]} />
+                </View>
+                <Text style={styles.progressText}>{progress}%</Text>
+              </View>
+            </View>
+          </View>
         </Modal>
       </View>
     </SafeAreaView>
@@ -304,6 +331,73 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: '#d9d9d9',
   },
+  confirmBar: {
+    position: 'absolute',
+    bottom: 28,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  confirmBtn: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  retakeBtn: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)'
+  },
+  acceptBtn: {
+    backgroundColor: '#0099FF',
+  },
+  loadingOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingCard: {
+    backgroundColor: '#141414',
+    borderRadius: 12,
+    padding: 24,
+    width: '80%',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#262626',
+  },
+  loadingTitle: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontFamily: 'SpButchLiteLight',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  progressContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  progressBar: {
+    width: '100%',
+    height: 8,
+    backgroundColor: '#2b2b2b',
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#0099FF',
+    borderRadius: 4,
+  },
+  progressText: {
+    color: '#bfbfbf',
+    fontSize: 14,
+    fontFamily: 'SpButchLiteLight',
+  },
   photoGrid: {
     width: '100%',
     flexDirection: 'row',
@@ -338,31 +432,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  confirmBar: {
-    position: 'absolute',
-    bottom: 28,
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-  },
-  confirmBtn: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  retakeBtn: {
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)'
-  },
-  acceptBtn: {
-    backgroundColor: '#0099FF',
-  },
 });
 
 export default Upload;
+
 
 
